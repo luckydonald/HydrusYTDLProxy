@@ -52,7 +52,7 @@ def list_providers():
         for item in providers:
             if isinstance(item, str):
                 flattened.append(item)
-            elif isinstance(item, list):
+            elif isinstance(item, (list, tuple)):
                 flattened.extend(flatten_providers(item))
         return flattened
 
@@ -61,7 +61,7 @@ def list_providers():
         valid_url = cls._VALID_URL
         if valid_url is False:
             continue
-        if isinstance(valid_url, list):
+        if isinstance(valid_url, (list, tuple)):
             providers.extend(flatten_providers(valid_url))
         else:
             providers.append(valid_url)
