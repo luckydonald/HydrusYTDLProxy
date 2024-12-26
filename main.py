@@ -1,4 +1,6 @@
-from pydantic import BaseModel
+import json
+
+from pydantic import BaseModel, ValidationError
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import StreamingResponse, RedirectResponse, JSONResponse
 from yt_dlp import YoutubeDL
@@ -6,7 +8,7 @@ from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP
 import os
-from typing import List, Optional, Union
+from typing import List, Optional, Union, NotRequired
 
 from pydantic import BaseModel
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
@@ -26,11 +28,11 @@ ydl_opts = {
 
 class Thumbnail(BaseModel):
     url: str
-    preference: Optional[int]
-    id: Optional[str]
-    height: Optional[int]
-    width: Optional[int]
-    resolution: Optional[str]
+    preference: Optional[int] = None
+    id: Optional[str] = None
+    height: Optional[int] = None
+    width: Optional[int] = None
+    resolution: Optional[str] = None
 
 class Format(BaseModel):
     format: str
@@ -38,11 +40,11 @@ class Format(BaseModel):
 
 class MetaResponseModel(BaseModel):
     title: Optional[str]
-    description: Optional[str]
-    tags: Optional[List[str]]
-    duration: Optional[int]
-    thumbnails: Optional[List[Thumbnail]]
     formats: List[Format]
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
+    duration: Optional[int] = None
+    thumbnails: Optional[List[Thumbnail]] = None
 
 @app.get("/providers", response_model=List[str])
 def list_providers():
@@ -110,6 +112,7 @@ def meta_about_url(url: str):
             thumbnails=info.get("thumbnails"),
             formats=formats,
         )
-
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=e.errors(include_url=False))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
