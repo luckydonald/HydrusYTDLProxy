@@ -21,10 +21,13 @@ ydl_opts = {
     ],
 }
 
+os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
+
 @app.get("/providers", response_model=List[str])
 def list_providers():
+
     """Get a list of domain names for all sites supported by yt-dlp."""
-    providers = [cls._VALID_URL for cls in gen_extractor_classes()]
+    providers = [cls._VALID_URL for cls in gen_extractor_classes() if isinstance(cls._VALID_URL, str)]
     return providers
 
 @app.post("/download-stream")
