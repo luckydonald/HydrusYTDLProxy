@@ -69,9 +69,12 @@ def list_providers():
             providers.append(valid_url)
     return providers
 
-@app.post("/download-stream")
+
+# noinspection PyShadowingBuiltins
+@app.get("/download-stream")
 def download_stream(
-    url: str, format: str = Query("mp4", regex="^(mp4|mp3|mkv|webm)$")
+    url: str,
+    format: str = Query("mp4", regex="^(mp4|mp3|mkv|webm)$"),
 ):
     """Download a URL and stream the requested format."""
     def stream_video():
@@ -88,7 +91,17 @@ def download_stream(
             yield from f
         os.remove(file_name)
 
-    return StreamingResponse(stream_video(), media_type=f"video/{format}")
+    # Extract filename from URL or default to a generic name
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)
+        file_name = f"{info['id']}.{format}"
+
+    headers = {
+        "Content-Disposition": f'attachment; filename="{file_name}"',
+        "Content-Type": f"video/{format}" if format in ["mp4", "mkv", "webm"] else "audio/mpeg",
+    }
+
+    return StreamingResponse(stream_video(), headers=headers)
 
 @app.get("/meta", response_model=MetaResponseModel)
 def meta_about_url(url: str):
