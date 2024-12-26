@@ -1,3 +1,4 @@
+from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import StreamingResponse, RedirectResponse, JSONResponse
 from yt_dlp import YoutubeDL
