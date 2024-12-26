@@ -5,10 +5,10 @@ from yt_dlp import YoutubeDL
 from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP
-
 import os
-from typing import List, Optional
+from typing import List, Optional, Union
 
+from pydantic import BaseModel
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
 
 app = FastAPI()
@@ -24,24 +24,45 @@ ydl_opts = {
     ],
 }
 
+class Thumbnail(BaseModel):
+    url: str
+    preference: Optional[int]
+    id: Optional[str]
+    height: Optional[int]
+    width: Optional[int]
+    resolution: Optional[str]
+
+class Format(BaseModel):
+    format: str
+    url: str
+
 class MetaResponseModel(BaseModel):
     title: Optional[str]
     description: Optional[str]
     tags: Optional[List[str]]
     duration: Optional[int]
-    thumbnails: Optional[List[dict]]
-    formats: List[dict]
+    thumbnails: Optional[List[Thumbnail]]
+    formats: List[Format]
 
 @app.get("/providers", response_model=List[str])
 def list_providers():
     """Get a list of domain names for all sites supported by yt-dlp."""
+    def flatten_providers(providers):
+        flattened = []
+        for item in providers:
+            if isinstance(item, str):
+                flattened.append(item)
+            elif isinstance(item, list):
+                flattened.extend(flatten_providers(item))
+        return flattened
+
     providers = []
     for cls in gen_extractor_classes():
         valid_url = cls._VALID_URL
         if valid_url is False:
             continue
         if isinstance(valid_url, list):
-            providers.extend(valid_url)
+            providers.extend(flatten_providers(valid_url))
         else:
             providers.append(valid_url)
     return providers
@@ -52,9 +73,15 @@ def download_stream(
 ):
     """Download a URL and stream the requested format."""
     def stream_video():
-        with YoutubeDL({**ydl_opts, "postprocessor_args": ["-f", format]}) as ydl:
+        with YoutubeDL(ydl_opts) as ydl:
+            ydl.params["format"] = format
             info = ydl.extract_info(url, download=True)
             file_name = ydl.prepare_filename(info)
+            # Adjust file extension if necessary
+            if format and not file_name.endswith(f".{format}"):
+                base_name, _ = os.path.splitext(file_name)
+                file_name = f"{base_name}.{format}"
+
         with open(file_name, "rb") as f:
             yield from f
         os.remove(file_name)
