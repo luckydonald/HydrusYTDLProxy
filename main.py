@@ -28,25 +28,25 @@ ydl_opts = {
 
 class Thumbnail(BaseModel):
     url: str
-    preference: Optional[int] = None
-    id: Optional[str] = None
-    height: Optional[int] = None
-    width: Optional[int] = None
-    resolution: Optional[str] = None
+    preference: int | None = None
+    id: str | None = None
+    height: int | None = None
+    width: int | None = None
+    resolution: str | None = None
 
 class Format(BaseModel):
     format: str
     url: str
 
 class MetaResponseModel(BaseModel):
-    title: Optional[str]
-    formats: List[Format]
-    description: Optional[str] = None
-    tags: Optional[List[str]] = None
-    duration: Optional[int] = None
-    thumbnails: Optional[List[Thumbnail]] = None
+    title: str | None = None
+    description: str | None = None
+    tags: list[str] | None = None
+    duration: int | None = None
+    thumbnails: list[Thumbnail] | None = None
+    formats: list[Format]
 
-@app.get("/providers", response_model=List[str])
+@app.get("/providers", response_model=list[str])
 def list_providers():
     """Get a list of domain names for all sites supported by yt-dlp."""
     def flatten_providers(providers):
@@ -71,7 +71,7 @@ def list_providers():
 
 @app.post("/download-stream")
 def download_stream(
-    url: str, format: Optional[str] = Query("mp4", regex="^(mp4|mp3|mkv|webm)$")
+    url: str, format: str = Query("mp4", regex="^(mp4|mp3|mkv|webm)$")
 ):
     """Download a URL and stream the requested format."""
     def stream_video():
