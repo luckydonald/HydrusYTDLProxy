@@ -8,7 +8,7 @@ from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP
 import os
-from typing import List, Optional, Union, NotRequired
+from typing import Literal
 
 from pydantic import BaseModel
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
@@ -26,6 +26,8 @@ ydl_opts = {
     ],
 }
 
+FORMATS_TYPE = Literal["mp4", "mp3", "mkv", "webm", "best"]
+
 class Thumbnail(BaseModel):
     url: str
     preference: int | None = None
@@ -35,7 +37,7 @@ class Thumbnail(BaseModel):
     resolution: str | None = None
 
 class Format(BaseModel):
-    format: str
+    format: FORMATS_TYPE
     url: str
 
 class MetaResponseModel(BaseModel):
@@ -74,34 +76,36 @@ def list_providers():
 @app.get("/download-stream")
 def download_stream(
     url: str,
-    format: str = Query("mp4", regex="^(mp4|mp3|mkv|webm)$"),
+    format: FORMATS_TYPE = "mp4",
 ):
+
     """Download a URL and stream the requested format."""
     def stream_video():
         with YoutubeDL(ydl_opts) as ydl:
-            ydl.params["format"] = format
-            info = ydl.extract_info(url, download=True)
-            file_name = ydl.prepare_filename(info)
-            # Adjust file extension if necessary
-            if format and not file_name.endswith(f".{format}"):
-                base_name, _ = os.path.splitext(file_name)
-                file_name = f"{base_name}.{format}"
+            try:
+                ydl.params["format"] = "bestvideo+bestaudio/best" if format == "best" else format
+                info = ydl.extract_info(url, download=True)
+                file_name = ydl.prepare_filename(info)
+
+                # Adjust file extension if necessary
+                if format != "best" and not file_name.endswith(f".{format}"):
+                    base_name, _ = os.path.splitext(file_name)
+                    file_name = f"{base_name}.{format}"
+
+                # Set appropriate content type
+                nonlocal media_type
+                media_type = "audio/mpeg" if format == "mp3" else "video/mp4" if format in ["best", "mp4"] else f"video/{format}"
+            except Exception:
+                ydl.params["format"] = "bestvideo+bestaudio/best"
+                info = ydl.extract_info(url, download=True)
+                file_name = ydl.prepare_filename(info)
 
         with open(file_name, "rb") as f:
             yield from f
         os.remove(file_name)
 
-    # Extract filename from URL or default to a generic name
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(url, download=False)
-        file_name = f"{info['id']}.{format}"
-
-    headers = {
-        "Content-Disposition": f'attachment; filename="{file_name}"',
-        "Content-Type": f"video/{format}" if format in ["mp4", "mkv", "webm"] else "audio/mpeg",
-    }
-
-    return StreamingResponse(stream_video(), headers=headers)
+    media_type = ""
+    return StreamingResponse(stream_video(), media_type=media_type)
 
 @app.get("/meta", response_model=MetaResponseModel)
 def meta_about_url(url: str):
@@ -115,6 +119,7 @@ def meta_about_url(url: str):
             {"format": "webm", "url": f"/download-stream?url={url}&format=webm"},
             {"format": "mp4", "url": f"/download-stream?url={url}&format=mp4"},
             {"format": "mp3", "url": f"/download-stream?url={url}&format=mp3"},
+            {"format": "best", "url": f"/download-stream?url={url}&format=best"},
         ]
 
         return MetaResponseModel(
