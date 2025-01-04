@@ -248,8 +248,10 @@ def meta_about_url(url: str):
         parsed_url = urlparse(url)
         tags = [
             "downloader:hydrus_ytdl_proxy",
-            f"hydrus_ytdl_proxy:domain:{parsed_url.hostname.removeprefix('www.')}",
-            f"hydrus_ytdl_proxy:extractor:{info.get('extractor')}",
+            f"hydrus_ytdl_proxy.domain:{parsed_url.hostname.removeprefix('www.')}",
+            f"hydrus_ytdl_proxy.extractor:{info.get('extractor')}",
+            f"hydrus_ytdl_proxy.id:{info.get('id')}",
+            f"id:{info.get('extractor')}:{info.get('id')}",
             *info.get("tags", []),
             *[f"category:{category}" for category in info.get("categories", [])],
         ]
