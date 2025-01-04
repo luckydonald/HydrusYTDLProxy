@@ -1,4 +1,5 @@
 import json
+from urllib.parse import urlparse, urlencode
 
 from pydantic import BaseModel, ValidationError
 from fastapi import FastAPI, HTTPException, Query
@@ -11,6 +12,9 @@ import os
 from typing import Literal
 
 from pydantic import BaseModel
+
+from utils.dates import epoch_to_iso
+
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
 
 app = FastAPI()
@@ -24,9 +28,16 @@ ydl_opts = {
         {"key": "FFmpegMetadata"},
         {"key": "EmbedThumbnail"},
     ],
+    'quiet': False,
+    'nooverwrites': True,
+    'writethumbnail': True,
+    'writeinfojson': True,
 }
 
 FORMATS_TYPE = Literal["mp4", "mp3", "mkv", "webm", "best"]
+
+# noinspection PyUnresolvedReferences
+FORMATS_TYPE_STRINGS: tuple[FORMATS_TYPE] = FORMATS_TYPE.__args__
 
 class Thumbnail(BaseModel):
     url: str
@@ -43,10 +54,14 @@ class Format(BaseModel):
 class MetaResponseModel(BaseModel):
     title: str | None = None
     description: str | None = None
+    date: int | str | None = None
     tags: list[str] | None = None
     duration: int | None = None
     thumbnails: list[Thumbnail] | None = None
     formats: list[Format]
+    width: int | None = None
+    height: int | None = None
+    meta: dict
 
 @app.get("/providers", response_model=list[str])
 def list_providers():
@@ -70,6 +85,7 @@ def list_providers():
         else:
             providers.append(valid_url)
     return providers
+# end def
 
 
 # noinspection PyShadowingBuiltins
@@ -81,16 +97,28 @@ def download_stream(
 
     """Download a URL and stream the requested format."""
     def stream_video():
+        yield ""
+        current_config = ydl_opts.copy()
+        current_config["format"] = "bestvideo+bestaudio/best"
+        if format != "best":
+            current_config["postprocessors"].append(
+                {
+                    'key': 'FFmpegVideoConvertor',
+                    'preferedformat': format,
+                }
+            )
+        # end if
         with YoutubeDL(ydl_opts) as ydl:
             try:
-                ydl.params["format"] = "bestvideo+bestaudio/best" if format == "best" else format
                 info = ydl.extract_info(url, download=True)
+                print(repr(info))
                 file_name = ydl.prepare_filename(info)
 
                 # Adjust file extension if necessary
                 if format != "best" and not file_name.endswith(f".{format}"):
                     base_name, _ = os.path.splitext(file_name)
                     file_name = f"{base_name}.{format}"
+                # end if
 
                 # Set appropriate content type
                 nonlocal media_type
@@ -99,13 +127,21 @@ def download_stream(
                 ydl.params["format"] = "bestvideo+bestaudio/best"
                 info = ydl.extract_info(url, download=True)
                 file_name = ydl.prepare_filename(info)
-
-        with open(file_name, "rb") as f:
-            yield from f
-        os.remove(file_name)
+            # end try
+        # end with
+        try:
+            with open(file_name, "rb") as f:
+                yield from f
+            # end with
+        finally:
+            os.remove(file_name)
+        # end if
+    # end def
 
     media_type = ""
     return StreamingResponse(stream_video(), media_type=media_type)
+# end def
+
 
 @app.get("/meta", response_model=MetaResponseModel)
 def meta_about_url(url: str):
@@ -113,24 +149,39 @@ def meta_about_url(url: str):
     try:
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
+        # end with
 
+        # noinspection PyShadowingBuiltins
         formats = [
-            {"format": "mkv", "url": f"/download-stream?url={url}&format=mkv"},
-            {"format": "webm", "url": f"/download-stream?url={url}&format=webm"},
-            {"format": "mp4", "url": f"/download-stream?url={url}&format=mp4"},
-            {"format": "mp3", "url": f"/download-stream?url={url}&format=mp3"},
-            {"format": "best", "url": f"/download-stream?url={url}&format=best"},
+            {"format": str(format), "url": f"/download-stream?{urlencode(dict(url=url, format=format))!s}"}
+            for format in FORMATS_TYPE_STRINGS
+        ]
+
+        parsed_url = urlparse(url)
+        tags = [
+            "downloader:hydrus_ytdl_proxy",
+            f"hydrus_ytdl_proxy:domain:{parsed_url.hostname.removeprefix('www.')}",
+            f"hydrus_ytdl_proxy:extractor:{info.get('extractor')}",
+            *info.get("tags", []),
+            *[f"category:{category}" for category in info.get("categories", [])],
         ]
 
         return MetaResponseModel(
             title=info.get("title"),
             description=info.get("description"),
-            tags=info.get("tags"),
+            upload_timestamp=epoch_to_iso(info.get("timestamp")),
+            fetch_timestamp=epoch_to_iso(info.get("epoch")),
+            tags=tags,
             duration=info.get("duration"),
             thumbnails=info.get("thumbnails"),
+            width=info.get("width"),
+            height=info.get("height"),
             formats=formats,
+            meta=info,
         )
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=e.errors(include_url=False))
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    # end try
+# end def

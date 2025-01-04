@@ -1,11 +1,8 @@
-# Test your FastAPI endpoints
-
-GET http://127.0.0.1:8000/
-Accept: application/json
-
-###
-
-GET http://127.0.0.1:8000/hello/User
-Accept: application/json
+# curl -X 'GET'
+#  'http://127.0.0.1:8000/meta?url=https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330'
+#  -H 'accept: application/json'
+GET http://127.0.0.1:8000/meta?url=https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330
+accept: application/json
 
 ###
+
