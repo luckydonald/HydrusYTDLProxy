@@ -9,7 +9,7 @@ from fastapi.responses import StreamingResponse
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
-from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP
+from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP, FFmpegVideoConvertorPP
 import os
 from typing import Literal
 
@@ -28,7 +28,7 @@ ydl_opts = {
     "outtmpl": "%(id)s.%(ext)s",
     "noplaylist": True,
     "postprocessors": [
-        {"key": clazz.__name__.removesuffix('')}
+        {"key": clazz.__name__.removesuffix('PP')}
         for clazz in
         (
             FFmpegEmbedSubtitlePP,
@@ -119,7 +119,7 @@ def download_stream(
     if format != "best":
         current_config["postprocessors"].append(
             {
-                'key': 'FFmpegVideoConvertor',
+                'key': FFmpegVideoConvertorPP.__name__.removesuffix('PP'),
                 'preferedformat': format,
             }
         )
