@@ -6,3 +6,9 @@ accept: application/json
 
 ###
 
+
+
+GET http://127.0.0.1:8000/download-stream?url=https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330&format=mp4
+accept: application/json
+
+###

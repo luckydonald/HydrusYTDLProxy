@@ -1,4 +1,7 @@
 import json
+from mimetypes import guess_type
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from urllib.parse import urlparse, urlencode
 
 from pydantic import BaseModel, ValidationError
@@ -14,6 +17,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 from utils.dates import epoch_to_iso
+from utils.misc import default
 
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
 
@@ -49,6 +53,9 @@ class Thumbnail(BaseModel):
 
 class Format(BaseModel):
     format: FORMATS_TYPE
+    mime: str
+    original_ext: str
+    original_mime: str
     url: str
 
 class MetaResponseModel(BaseModel):
@@ -94,52 +101,70 @@ def download_stream(
     url: str,
     format: FORMATS_TYPE = "mp4",
 ):
+    def progress_hook(d: dict):
+        if d['status'] == 'downloading':
+            print(f"Downloading: {d['filename']} | Progress: {d['downloaded_bytes'] / d['total_bytes'] * 100:.2f}%")
+        # end def
+    # end def
+
+    current_config = ydl_opts.copy()
+    current_config["format"] = "bestvideo+bestaudio/best"
+    # noinspection PyTypeChecker
+    current_config['progress_hooks'] = [progress_hook]
+    if format != "best":
+        current_config["postprocessors"].append(
+            {
+                'key': 'FFmpegVideoConvertor',
+                'preferedformat': format,
+            }
+        )
+    # end if
+
+    with YoutubeDL(ydl_opts) as ydl:
+        outer_info = ydl.extract_info(url, download=False)
+    # end if
+    mime = guess_type(f'filename.{outer_info.get("ext", format)}')[0]
 
     """Download a URL and stream the requested format."""
     def stream_video():
         yield ""
-        current_config = ydl_opts.copy()
-        current_config["format"] = "bestvideo+bestaudio/best"
-        if format != "best":
-            current_config["postprocessors"].append(
-                {
-                    'key': 'FFmpegVideoConvertor',
-                    'preferedformat': format,
-                }
-            )
-        # end if
-        with YoutubeDL(ydl_opts) as ydl:
-            try:
-                info = ydl.extract_info(url, download=True)
-                print(repr(info))
-                file_name = ydl.prepare_filename(info)
+        with TemporaryDirectory() as tmpdir:
+            print('created temporary directory', tmpdir)
+            tmpdir = Path(tmpdir).absolute()
+            current_config['temp_dir'] = str(tmpdir)
+            current_config['outtmpl'] = str(tmpdir / '%(title)s.%(ext)s')
 
-                # Adjust file extension if necessary
-                if format != "best" and not file_name.endswith(f".{format}"):
-                    base_name, _ = os.path.splitext(file_name)
-                    file_name = f"{base_name}.{format}"
-                # end if
+            with YoutubeDL(ydl_opts) as ydl:
+                try:
+                    # noinspection PyShadowingNames
+                    info = ydl.extract_info(url, download=True)
+                    yield ""
+                    print(repr(info))
+                    file_name = ydl.prepare_filename(info)
+                    yield ""
 
-                # Set appropriate content type
-                nonlocal media_type
-                media_type = "audio/mpeg" if format == "mp3" else "video/mp4" if format in ["best", "mp4"] else f"video/{format}"
-            except Exception:
-                ydl.params["format"] = "bestvideo+bestaudio/best"
-                info = ydl.extract_info(url, download=True)
-                file_name = ydl.prepare_filename(info)
-            # end try
-        # end with
-        try:
-            with open(file_name, "rb") as f:
-                yield from f
+                    # Adjust file extension if necessary
+                    if format != "best" and not file_name.endswith(f".{format}"):
+                        base_name, _ = os.path.splitext(file_name)
+                        file_name = f"{base_name}.{format}"
+                    # end if
+                except Exception:
+                    ydl.params["format"] = "bestvideo+bestaudio/best"
+                    info = ydl.extract_info(url, download=True)
+                    file_name = ydl.prepare_filename(info)
+                # end try
             # end with
-        finally:
-            os.remove(file_name)
-        # end if
+            try:
+                with open(file_name, "rb") as f:
+                    yield from f
+                # end with
+            finally:
+                os.remove(file_name)
+            # end if
+        # end with
     # end def
 
-    media_type = ""
-    return StreamingResponse(stream_video(), media_type=media_type)
+    return StreamingResponse(stream_video(), media_type=mime)
 # end def
 
 
@@ -152,10 +177,30 @@ def meta_about_url(url: str):
         # end with
 
         # noinspection PyShadowingBuiltins
-        formats = [
-            {"format": str(format), "url": f"/download-stream?{urlencode(dict(url=url, format=format))!s}"}
-            for format in FORMATS_TYPE_STRINGS
+        formats: list[Format] = [
+            Format(
+                format=str(original_format),
+                mime=default(
+                    guess_type(f'filename.{original_format}')[0],
+                    original_mime,
+                ),
+                original_ext=info.get("ext"),
+                original_mime=original_mime,
+                url=f"/download-stream?{urlencode(dict(url=url, format=original_format))!s}",
+            )
+            for original_mime, original_format in [
+                # tuple:
+                (
+                    default(
+                        guess_type(f'filename.{info.get("ext", format)}')[0],
+                        "audio/mpeg" if format == "mp3" else "video/mp4" if format == "best" else f"video/{format}"
+                    ),
+                    format,
+                )
+                for format in FORMATS_TYPE_STRINGS
+            ]
         ]
+        print(formats)
 
         parsed_url = urlparse(url)
         tags = [
