@@ -65,7 +65,8 @@ class Format(BaseModel):
 class MetaResponseModel(BaseModel):
     title: str | None = None
     description: str | None = None
-    date: int | str | None = None
+    date: datetime | None = None
+    date_of_fetch: datetime | None = None
     tags: list[str] | None = None
     duration: int | None = None
     thumbnails: list[Thumbnail] | None = None
@@ -220,8 +221,8 @@ def meta_about_url(url: str):
         return MetaResponseModel(
             title=info.get("title"),
             description=info.get("description"),
-            upload_timestamp=epoch_to_iso(info.get("timestamp")),
-            fetch_timestamp=epoch_to_iso(info.get("epoch")),
+            date=epoch_to_iso(info.get("timestamp")),
+            date_of_fetch=epoch_to_iso(info.get("epoch")),
             tags=tags,
             duration=info.get("duration"),
             thumbnails=info.get("thumbnails"),
