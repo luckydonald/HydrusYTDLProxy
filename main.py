@@ -108,7 +108,7 @@ def list_providers():
 
 
 # noinspection PyShadowingBuiltins
-@app.get("/download-stream")
+@app.get("/dl")
 def download_stream(
     url: str,
     format: FORMATS_TYPE = "mp4",
@@ -122,7 +122,7 @@ def download_stream(
     current_config = ydl_opts.copy()
     current_config["format"] = "bestvideo+bestaudio/best"
     # noinspection PyTypeChecker
-    current_config['progress_hooks'] = [progress_hook]
+    # current_config['progress_hooks'] = [progress_hook]
     if format != "best":
         current_config["postprocessors"].append(
             {
@@ -154,19 +154,14 @@ def download_stream(
                     yield ""
                     print(repr(info))
                     file_name = ydl.prepare_filename(info)
-                    yield ""
-
-                    # Adjust file extension if necessary
-                    if format != "best" and not file_name.endswith(f".{format}"):
-                        base_name, _ = os.path.splitext(file_name)
-                        file_name = f"{base_name}.{format}"
-                    # end if
                 except Exception:
+                    yield ""
                     ydl.params["format"] = "bestvideo+bestaudio/best"
                     info = ydl.extract_info(url, download=True)
                     file_name = ydl.prepare_filename(info)
                 # end try
             # end with
+            yield ""
             try:
                 with open(file_name, "rb") as f:
                     yield from f
