@@ -29,9 +29,13 @@ ydl_opts = {
     "outtmpl": "%(id)s.%(ext)s",
     "noplaylist": True,
     "postprocessors": [
-        {"key": "FFmpegEmbedSubtitle"},
-        {"key": "FFmpegMetadata"},
-        {"key": "EmbedThumbnail"},
+        {"key": clazz.__name__.removesuffix('')}
+        for clazz in
+        (
+            FFmpegEmbedSubtitlePP,
+            FFmpegMetadataPP,
+            EmbedThumbnailPP,
+        )
     ],
     'quiet': False,
     'nooverwrites': True,
