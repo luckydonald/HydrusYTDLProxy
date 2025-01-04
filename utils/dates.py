@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import time
 from zoneinfo import ZoneInfo
 
@@ -8,13 +8,13 @@ def epoch_to_iso(epoch_time: datetime | int | None) -> str | None:
         return None
     # end if
 
-    if not isinstance(epoch_time, (datetime.datetime, int)):
+    if not isinstance(epoch_time, (datetime, int)):
         raise TypeError("Input must be of type datetime.datetime, int (epoch) or None")
     # end if
 
     if isinstance(epoch_time, int):
         # Convert epoch time to a naive datetime object
-        naive_datetime = datetime.datetime.fromtimestamp(epoch_time)
+        naive_datetime = datetime.fromtimestamp(epoch_time)
     else:
         # Ensure the input is a naive datetime object
         if epoch_time.tzinfo is not None:
