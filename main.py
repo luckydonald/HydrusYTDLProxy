@@ -17,6 +17,7 @@ from typing import Literal
 from pydantic import BaseModel
 
 from utils.dates import epoch_to_iso
+from utils.fully_qualified_name import fqn
 from utils.misc import default
 from utils.regexes import normalize_multiline_regex
 from utils.types import guess_mime
@@ -101,10 +102,16 @@ def list_providers():
                 flattened.append(item)
             elif isinstance(item, (list, tuple)):
                 flattened.extend(flatten_providers(item))
+            # end if
+        # end for
         return flattened
+    # end def
 
     providers = []
     for cls in gen_extractor_classes():
+        if fqn(cls) == 'yt_dlp.extractor.generic.GenericIE' or cls.__name__ == 'GenericIE':
+            continue
+        # end if
         valid_url = cls._VALID_URL
         if valid_url is False:
             continue
@@ -113,6 +120,9 @@ def list_providers():
         else:
             assert isinstance(valid_url, str)
             providers.append(valid_url)
+        # end if
+        if ".*" in providers:
+            raise ValueError(f"Invalid Regex '.*' in provider {fqn(cls)} ")
         # end if
     # end for
 
