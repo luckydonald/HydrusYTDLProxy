@@ -228,7 +228,7 @@ def meta_about_url(url: str):
                 ),
                 original_ext=info.get("ext"),
                 original_mime=original_mime,
-                url=f"/download-stream?{urlencode(dict(url=url, format=format))!s}",
+                url=f"{app.url_path_for(download_stream.__name__)}?{urlencode(dict(url=url, format=format))!s}",
             )
             for original_mime, format in [
                 # tuple (original_mime, format):
