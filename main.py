@@ -181,8 +181,8 @@ def meta_about_url(url: str):
             Format(
                 format=str(original_format),
                 mime=default(
-                    guess_type(f'filename.{original_format}')[0],
-                    original_mime,
+                    value=guess_type(f'filename.{original_format}')[0],
+                    default=original_mime,
                 ),
                 original_ext=info.get("ext"),
                 original_mime=original_mime,
@@ -192,8 +192,8 @@ def meta_about_url(url: str):
                 # tuple:
                 (
                     default(
-                        guess_type(f'filename.{info.get("ext", format)}')[0],
-                        "audio/mpeg" if format == "mp3" else "video/mp4" if format == "best" else f"video/{format}"
+                        value=guess_type(f'filename.{info.get("ext", format)}')[0],
+                        default="audio/mpeg" if format == "mp3" else "video/mp4" if format == "best" else f"video/{format}"
                     ),
                     format,
                 )
