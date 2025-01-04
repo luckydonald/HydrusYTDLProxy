@@ -47,6 +47,7 @@ FORMATS_TYPE = Literal["mp4", "mp3", "mkv", "webm", "best"]
 # noinspection PyUnresolvedReferences
 FORMATS_TYPE_STRINGS: tuple[FORMATS_TYPE] = FORMATS_TYPE.__args__
 
+
 class Thumbnail(BaseModel):
     url: str
     preference: int | None = None
@@ -54,6 +55,8 @@ class Thumbnail(BaseModel):
     height: int | None = None
     width: int | None = None
     resolution: str | None = None
+# end class
+
 
 class Format(BaseModel):
     format: FORMATS_TYPE
@@ -61,6 +64,8 @@ class Format(BaseModel):
     original_ext: str
     original_mime: str
     url: str
+# end class
+
 
 class MetaResponseModel(BaseModel):
     title: str | None = None
@@ -74,6 +79,8 @@ class MetaResponseModel(BaseModel):
     width: int | None = None
     height: int | None = None
     meta: dict
+# end class
+
 
 @app.get("/providers", response_model=list[str])
 def list_providers():
