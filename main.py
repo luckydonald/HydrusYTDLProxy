@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -17,6 +18,7 @@ from pydantic import BaseModel
 
 from utils.dates import epoch_to_iso
 from utils.misc import default
+from utils.regexes import normalize_multiline_regex
 from utils.types import guess_mime
 
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
@@ -82,7 +84,14 @@ class MetaResponseModel(BaseModel):
 # end class
 
 
-@app.get("/providers", response_model=list[str])
+class ProviderResponseModel(BaseModel):
+    all: list[str]
+    normalized: list[str]
+    regex: str
+# end class
+
+
+@app.get("/providers", response_model=ProviderResponseModel)
 def list_providers():
     """Get a list of domain names for all sites supported by yt-dlp."""
     def flatten_providers(providers):
@@ -102,8 +111,19 @@ def list_providers():
         if isinstance(valid_url, (list, tuple)):
             providers.extend(flatten_providers(valid_url))
         else:
+            assert isinstance(valid_url, str)
             providers.append(valid_url)
-    return providers
+        # end if
+    # end for
+
+    better_providers = [normalize_multiline_regex(provider) for provider in providers]
+    providers_merged = "|".join(better_providers)
+
+    return ProviderResponseModel(
+        all=providers,
+        normalized=better_providers,
+        regex=providers_merged,
+    )
 # end def
 
 
