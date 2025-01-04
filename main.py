@@ -78,7 +78,7 @@ class MetaResponseModel(BaseModel):
     tags: list[str] | None = None
     duration: int | None = None
     thumbnails: list[Thumbnail] | None = None
-    formats: list[Format]
+    formats: dict[FORMATS_TYPE, Format]
     width: int | None = None
     height: int | None = None
     meta: dict
@@ -219,8 +219,8 @@ def meta_about_url(url: str):
         # end with
 
         # noinspection PyShadowingBuiltins
-        formats: list[Format] = [
-            Format(
+        formats: dict[FORMATS_TYPE, Format] = {
+            format: Format(
                 format=str(format),
                 mime=default(
                     value=guess_mime(ext=format),
@@ -243,8 +243,7 @@ def meta_about_url(url: str):
                 )
                 for format in FORMATS_TYPE_STRINGS
             ]
-        ]
-        print(formats)
+        }
 
         parsed_url = urlparse(url)
         tags = [
