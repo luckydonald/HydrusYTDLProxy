@@ -18,6 +18,7 @@ from pydantic import BaseModel
 
 from utils.dates import epoch_to_iso
 from utils.misc import default
+from utils.types import guess_mime
 
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
 
@@ -179,22 +180,24 @@ def meta_about_url(url: str):
         # noinspection PyShadowingBuiltins
         formats: list[Format] = [
             Format(
-                format=str(original_format),
+                format=str(format),
                 mime=default(
-                    value=guess_type(f'filename.{original_format}')[0],
+                    value=guess_mime(ext=format),
                     default=original_mime,
                 ),
                 original_ext=info.get("ext"),
                 original_mime=original_mime,
-                url=f"/download-stream?{urlencode(dict(url=url, format=original_format))!s}",
+                url=f"/download-stream?{urlencode(dict(url=url, format=format))!s}",
             )
-            for original_mime, original_format in [
-                # tuple:
+            for original_mime, format in [
+                # tuple (original_mime, format):
                 (
+                    # original_mime:
                     default(
-                        value=guess_type(f'filename.{info.get("ext", format)}')[0],
+                        value=guess_mime(ext=info.get("ext", format)),
                         default="audio/mpeg" if format == "mp3" else "video/mp4" if format == "best" else f"video/{format}"
                     ),
+                    # format:
                     format,
                 )
                 for format in FORMATS_TYPE_STRINGS
