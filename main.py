@@ -127,6 +127,7 @@ def download_stream(
 
     with YoutubeDL(ydl_opts) as ydl:
         outer_info = ydl.extract_info(url, download=False)
+        outer_file_name = ydl.prepare_filename(outer_info)
     # end if
     mime = guess_type(f'filename.{outer_info.get("ext", format)}')[0]
 
@@ -169,7 +170,11 @@ def download_stream(
         # end with
     # end def
 
-    return StreamingResponse(stream_video(), media_type=mime)
+    headers = {
+        'Content-Disposition': f'attachment; filename="{outer_file_name.replace('"', '\'')}"',
+    }
+
+    return StreamingResponse(stream_video(), headers=headers, media_type=mime)
 # end def
 
 
