@@ -129,7 +129,7 @@ def download_stream(
         outer_info = ydl.extract_info(url, download=False)
         outer_file_name = ydl.prepare_filename(outer_info)
     # end if
-    mime = guess_type(f'filename.{outer_info.get("ext", format)}')[0]
+    mime = guess_mime(ext=outer_info.get("ext", format))
 
     """Download a URL and stream the requested format."""
     def stream_video():
