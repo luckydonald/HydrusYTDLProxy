@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 from urllib.parse import urlparse, urlencode
 
 from pydantic import ValidationError
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor import gen_extractor_classes
@@ -211,7 +211,7 @@ def download_stream(
 
 
 @app.get("/meta", response_model=MetaResponseModel)
-def meta_about_url(url: str):
+def meta_about_url(url: str, request: Request):
     """Get metadata about the given URL."""
     try:
         with YoutubeDL(ydl_opts) as ydl:
@@ -228,7 +228,7 @@ def meta_about_url(url: str):
                 ),
                 original_ext=info.get("ext"),
                 original_mime=original_mime,
-                url=f"{app.url_path_for(download_stream.__name__)}?{urlencode(dict(url=url, format=format))!s}",
+                url=f"{request.url_for(download_stream.__name__)}?{urlencode(dict(url=url, format=format))!s}",
             )
             for original_mime, format in [
                 # tuple (original_mime, format):
