@@ -1,12 +1,11 @@
-import json
-from mimetypes import guess_type
+from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlparse, urlencode
 
-from pydantic import BaseModel, ValidationError
-from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import StreamingResponse, RedirectResponse, JSONResponse
+from pydantic import ValidationError
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
