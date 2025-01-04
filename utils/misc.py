@@ -1,18 +1,21 @@
 from typing import overload, TypeVar
 
-A = TypeVar('A', bound=object)  # A can be any type, but not None
-B = TypeVar('B')
+VALUE = TypeVar('VALUE', bound=object)  # can be any type, but not None
+DEFAULT = TypeVar('DEFAULT')
 
 
+# noinspection PyShadowingNames
 @overload
-def default(a: None, b: B) -> B: ...
+def default(value: None, default: DEFAULT) -> DEFAULT: ...
 
+# noinspection PyShadowingNames
 @overload
-def default(a: A, b: B) -> A: ...
+def default(value: VALUE, default: DEFAULT) -> VALUE: ...
 
-def default(a: A | None, b: B) -> A | B:
-    if a is None:
-        return b
+# noinspection PyShadowingNames
+def default(value: VALUE | None, default: DEFAULT) -> VALUE | DEFAULT:
+    if value is None:
+        return default
     # end if
-    return a
+    return value
 # end def
