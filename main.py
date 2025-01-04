@@ -173,7 +173,7 @@ def download_stream(
     # end def
 
     headers = {
-        'Content-Disposition': f'attachment; filename="{outer_file_name.replace('"', '\'')}"',
+        'Content-Disposition': f'attachment; filename="{outer_file_name.replace(""" " """.strip(), """ """)}"',
     }
 
     return StreamingResponse(stream_video(), headers=headers, media_type=mime)
