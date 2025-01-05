@@ -1,9 +1,0 @@
-[phases.setup]
-aptPkgs = ["...", "ffmpeg"]  # Install the ffmpeg package with apt-get
-
-
-[phase.start]
-cmd = "fastapi run main.py --port=3000"
-
-[start]
-cmd = "fastapi run main.py --port=3000"
