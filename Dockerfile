@@ -1,6 +1,10 @@
 FROM python:latest
 
 WORKDIR /app/
+
+EXPOSE 8080
+CMD [ "fastapi", "run", "main.py", "--port=8080" ]
+
 COPY requirements.txt /install/
 RUN pip install -r /install/requirements.txt \
     && apt-get update \
@@ -11,7 +15,3 @@ RUN pip install -r /install/requirements.txt \
     ;
 
 COPY ./main.py ./utils /app/
-
-EXPOSE 8080
-CMD [ "fastapi", "run", "main.py", "--port=8080" ]
-
