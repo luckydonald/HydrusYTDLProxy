@@ -10,7 +10,7 @@ RUN pip install -r /install/requirements.txt \
     && rm -rf /var/lib/apt/lists/* \
     ;
 
-COPY ./main.py ./utils/ /app/
+COPY ./main.py ./utils /app/
 
 EXPOSE 8080
 CMD [ "fastapi", "run", "main.py", "--port=8080" ]
