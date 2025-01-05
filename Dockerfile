@@ -14,4 +14,4 @@ RUN pip install -r /install/requirements.txt \
     && rm -rf /var/lib/apt/lists/* \
     ;
 
-COPY ./main.py ./utils /app/
+COPY ./hydrus_ytdl_proxy ./main.py /app/
