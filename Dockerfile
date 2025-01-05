@@ -17,4 +17,5 @@ RUN pip install -r /install/requirements.txt \
 COPY ./hydrus_ytdl_proxy ./main.py /app/
 
 RUN pip install directory_tree \
-    && python -m directory_tree
+    && python -m directory_tree \
+    && echo "<[ cache breaker: 002 ]>"
