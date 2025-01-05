@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["...", "ffmpeg"] # Install the ffmpeg package from Nix
+aptPkgs = ["...", "ffmpeg"]  # Install the ffmpeg package with apt-get
 
 
 [phase.start]
