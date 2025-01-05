@@ -1,4 +1,4 @@
-FROM python:latest AS final_image
+FROM python:latest
 
 WORKDIR /app/
 
@@ -17,9 +17,6 @@ RUN pip install -r /install/requirements.txt \
 COPY ./main.py /app/
 COPY ./hydrus_ytdl_proxy  /app/hydrus_ytdl_proxy/
 
-FROM final_image
 RUN pip install directory_tree \
     && python -m directory_tree \
     && echo "<[ cache breaker: 002 ]>"
-
-FROM final_image
