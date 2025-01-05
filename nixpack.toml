@@ -3,4 +3,7 @@ nixPkgs = ["...", "ffmpeg"] # Install the ffmpeg package from Nix
 
 
 [phase.start]
-cmd = "fastapi run main.py --port=${PORT:-3000}"
+cmd = "fastapi run main.py --port=3000"
+
+[start]
+cmd = "fastapi run main.py --port=3000"
