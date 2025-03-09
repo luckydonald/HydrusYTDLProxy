@@ -15,6 +15,7 @@ from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP, FFmpegVideoConvertorPP
 from pydantic import BaseModel
+from starlette.responses import HTMLResponse
 
 from .utils.dates import epoch_to_iso
 from .utils.fully_qualified_name import fqn
@@ -275,4 +276,14 @@ def meta_about_url(url: str, request: Request):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     # end try
+# end def
+
+
+@app.get('/', tags=["html"])
+def index():
+    return HTMLResponse(dedent("""
+        <h1>Hydrus YTDL</h1>
+        <a href="/docs">API Documentation (OpenAPI)</a><br>
+        <a href="/redoc">API Documentation (Redoc)</a><br>
+    """))
 # end def
