@@ -1,7 +1,11 @@
+import os
+
 from datetime import datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlparse, urlencode
+from textwrap import dedent
+from typing import Literal
 
 from pydantic import ValidationError
 from fastapi import FastAPI, HTTPException, Request
@@ -10,9 +14,6 @@ from yt_dlp import YoutubeDL
 from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP, FFmpegVideoConvertorPP
-import os
-from typing import Literal
-
 from pydantic import BaseModel
 
 from .utils.dates import epoch_to_iso
@@ -20,6 +21,7 @@ from .utils.fully_qualified_name import fqn
 from .utils.misc import default
 from .utils.regexes import normalize_multiline_regex
 from .utils.types import guess_mime
+
 
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
 
