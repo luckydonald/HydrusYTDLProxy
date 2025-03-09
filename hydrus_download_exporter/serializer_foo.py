@@ -8,9 +8,9 @@ def run(
     width=512,
     title="Downlaoder",
     payload_description="Automatically generated payload",
+    host='hcydrus-ytdl-proxy.example.com',
     text="",
     path="/Users/user/git/hydrusnetwork/hydrus/EXPORT/GENERATED.png",
-    host='hcydrus-ytdl-proxy-u0g0sw4cwwk4s8o8g84ksw0g.c1.bn-x.de',
     proto = 'https',
 ):
     payload = generate_stuff_payload(host, proto, services=PROVIDED_SERVICES_IDS)#
