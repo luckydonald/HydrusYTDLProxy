@@ -1,6 +1,7 @@
 import os
 
 from datetime import datetime
+from html import escape
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlparse, urlencode
@@ -15,7 +16,7 @@ from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP, FFmpegVideoConvertorPP
 from pydantic import BaseModel
-from starlette.responses import HTMLResponse
+from starlette.responses import HTMLResponse, RedirectResponse
 
 from .utils.dates import epoch_to_iso
 from .utils.fully_qualified_name import fqn
@@ -285,5 +286,27 @@ def index():
         <h1>Hydrus YTDL</h1>
         <a href="/docs">API Documentation (OpenAPI)</a><br>
         <a href="/redoc">API Documentation (Redoc)</a><br>
+        <a href="/export.html">Build and export configuration</a><br>
     """))
+# end def
+
+
+@app.get("/export.html", tags=["html"])
+def export(request: Request):
+    return HTMLResponse(dedent(f"""
+        <h1>Hydrus YTDL Config Creator</h1>
+        <form action="" method="POST">
+            <label>Proto <input type="text" name="proto" value="{escape(request.headers.get('x-forwarded-proto', request.url.scheme))}" /></label><br>
+            <label>Host <input type="text" name="host" value="{escape(request.url.hostname)}" /></label><br>
+            <label>Path <input type="text" name="path" value="/" /></label><br>
+            <input type="submit" value="Submit" />
+        </form>
+    """))
+# end def
+
+
+@app.post("/export.html", tags=["html"])
+def export_submit(request: Request):
+    # redirect back to get route, 302 FOUND to drop the POST to use GET.
+    return RedirectResponse(request.url_for("index"), status_code=302)
 # end def
