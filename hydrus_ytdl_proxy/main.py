@@ -306,7 +306,10 @@ def export(request: Request):
 
 
 @app.post("/export.html", tags=["html"])
-def export_submit(request: Request):
+def export_submit(
+    request: Request,
+):
+
     # redirect back to get route, 302 FOUND to drop the POST to use GET.
     return RedirectResponse(request.url_for("index"), status_code=302)
 # end def
