@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 from html import escape
 from pathlib import Path
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, NamedTemporaryFile
 from urllib.parse import urlparse, urlencode
 from textwrap import dedent
 from typing import Literal, Annotated
@@ -16,7 +16,7 @@ from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP, FFmpegVideoConvertorPP
 from pydantic import BaseModel
-from starlette.responses import HTMLResponse, RedirectResponse
+from starlette.responses import HTMLResponse, RedirectResponse, FileResponse
 
 from .utils.dates import epoch_to_iso
 from .utils.fully_qualified_name import fqn
@@ -321,11 +321,21 @@ def export_submit(
 ):
     from hydrus_download_exporter.serializer_foo import run
 
-    run(
-        title=f'Hydrus YTDLProxy Config for "{provider.title()}"',
-        payload_description="Automatically generated downloader using Hydrus YTDLProxy",
-        text="This was created by Hydrus YTDLProxy, to allow you to use a self-hosted YTDLP to download videos from platforms which have too advanced playback systems which Hydrus downloader can not support natively.",
-    )
-    # redirect back to get route, 302 FOUND to drop the POST to use GET.
-    return RedirectResponse(request.url_for("index"), status_code=302)
+    with NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
+        run(
+            title=f'Hydrus YTDLProxy Config for "{provider.title()}"',
+            payload_description="Automatically generated downloader using Hydrus YTDLProxy",
+            text="This was created by Hydrus YTDLProxy, to allow you to use a self-hosted YTDLP to download videos from platforms which have too advanced playback systems which Hydrus downloader can not support natively.",
+            proto=proto,
+            host=host,
+            path=path,
+        )
+        # todo: probably te file is gone once we actually send it, so maybe use a different method to send the file...
+        return FileResponse(
+            path=tmpfile.name,
+            status_code=200,
+            media_type="image/png",
+            filename=f"hydrus_ytdl_proxy_config_{provider.lower()}.png",
+        )
+    # end with
 # end def
