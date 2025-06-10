@@ -6,10 +6,10 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from urllib.parse import urlparse, urlencode
 from textwrap import dedent
-from typing import Literal
+from typing import Literal, Annotated
 
-from pydantic import ValidationError
-from fastapi import FastAPI, HTTPException, Request
+from pydantic import ValidationError, JsonValue
+from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import StreamingResponse
 from yt_dlp import YoutubeDL
 from yt_dlp.extractor import gen_extractor_classes
@@ -283,33 +283,49 @@ def meta_about_url(url: str, request: Request):
 @app.get('/', tags=["html"])
 def index():
     return HTMLResponse(dedent("""
-        <h1>Hydrus YTDL</h1>
+        <h1>Hydrus YTDLProxy</h1>
         <a href="/docs">API Documentation (OpenAPI)</a><br>
         <a href="/redoc">API Documentation (Redoc)</a><br>
         <a href="/export.html">Build and export configuration</a><br>
     """))
 # end def
 
+def render_dropdown(values: dict[JsonValue, str], *, name: str) -> str:
+    options = ("\n".join([f'<option value="{escape(key)}">{escape(value)}</option>' for key, value in values.items()]))
+    return options.join([f'<select name="{escape(name)}">', '</select>'])
+# end def
 
 @app.get("/export.html", tags=["html"])
 def export(request: Request):
+    dropdown_options = {provider: provider for provider in list_providers().normalized}
+    dropdown = render_dropdown(dropdown_options, name="provider")
     return HTMLResponse(dedent(f"""
-        <h1>Hydrus YTDL Config Creator</h1>
+        <h1>Hydrus YTDLProxy Config Creator</h1>
         <form action="" method="POST">
             <label>Proto <input type="text" name="proto" value="{escape(request.headers.get('x-forwarded-proto', request.url.scheme))}" /></label><br>
             <label>Host <input type="text" name="host" value="{escape(request.url.hostname)}" /></label><br>
             <label>Path <input type="text" name="path" value="/" /></label><br>
+            {dropdown}
             <input type="submit" value="Submit" />
         </form>
     """))
 # end def
 
-
 @app.post("/export.html", tags=["html"])
 def export_submit(
     request: Request,
+    proto: Annotated[str, Form()],
+    host: Annotated[str, Form()],
+    path: Annotated[str, Form()],
+    provider: Annotated[str, Form()],
 ):
+    from hydrus_download_exporter.serializer_foo import run
 
+    run(
+        title=f'Hydrus YTDLProxy Config for "{provider.title()}"',
+        payload_description="Automatically generated downloader using Hydrus YTDLProxy",
+        text="This was created by Hydrus YTDLProxy, to allow you to use a self-hosted YTDLP to download videos from platforms which have too advanced playback systems which Hydrus downloader can not support natively.",
+    )
     # redirect back to get route, 302 FOUND to drop the POST to use GET.
     return RedirectResponse(request.url_for("index"), status_code=302)
 # end def

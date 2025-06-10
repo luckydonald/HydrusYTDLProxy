@@ -1,3 +1,5 @@
+import tempfile
+
 from hydrus.client import ClientSerialisable
 
 from serializer_foo_two import generate_stuff_payload, PROVIDED_SERVICES_IDS
@@ -6,13 +8,21 @@ from serializer_foo_patch import patch
 
 def run(
     width=512,
-    title="Downlaoder",
+    title="Downloader",
     payload_description="Automatically generated payload",
-    host='hcydrus-ytdl-proxy.example.com',
+    host='hydrus-ytdl-proxy.example.com',
     text="",
-    path="/Users/user/git/hydrusnetwork/hydrus/EXPORT/GENERATED.png",
+    path: str | None = None,
     proto = 'https',
 ):
+
+    if path is None:
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
+            result = run(width, title, payload_description, host, text, tmpfile.name, proto)
+            input(f'Your file is saved to {tmpfile.name!r}. Press Enter to exit.')
+            return result
+        # end with
+    # end if
     payload = generate_stuff_payload(host, proto, services=PROVIDED_SERVICES_IDS)#
     (payload_bytes, payload_length) = ClientSerialisable.GetPayloadBytesAndLength(payload)
     patch()
