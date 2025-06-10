@@ -16,7 +16,8 @@ from yt_dlp.extractor import gen_extractor_classes
 from yt_dlp.postprocessor.embedthumbnail import EmbedThumbnailPP
 from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP, FFmpegVideoConvertorPP
 from pydantic import BaseModel
-from starlette.responses import HTMLResponse, RedirectResponse, FileResponse
+from starlette.responses import HTMLResponse, FileResponse
+from starlette.background import BackgroundTask
 
 from .utils.dates import epoch_to_iso
 from .utils.fully_qualified_name import fqn
@@ -321,7 +322,8 @@ def export_submit(
 ):
     from hydrus_download_exporter.serializer_foo import run
 
-    with NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
+    tmpfile = NamedTemporaryFile(suffix=".png", delete=False)
+    try:
         run(
             title=f'Hydrus YTDLProxy Config for "{provider.title()}"',
             payload_description="Automatically generated downloader using Hydrus YTDLProxy",
@@ -330,12 +332,19 @@ def export_submit(
             host=host,
             path=path,
         )
-        # todo: probably te file is gone once we actually send it, so maybe use a different method to send the file...
-        return FileResponse(
-            path=tmpfile.name,
-            status_code=200,
-            media_type="image/png",
-            filename=f"hydrus_ytdl_proxy_config_{provider.lower()}.png",
-        )
-    # end with
+        temp_file = tmpfile.name
+    except Exception as e:
+        tmpfile.close()
+        raise e
+    finally:
+        tmpfile.close()
+    # end try
+
+    return FileResponse(
+        path=temp_file,
+        status_code=200,
+        media_type="image/png",
+        filename=f"hydrus_ytdl_proxy_config_{provider.lower()}.png",
+        background=BackgroundTask(lambda: os.remove(temp_file)),  # cleanup the file after response is sent
+    )
 # end def
