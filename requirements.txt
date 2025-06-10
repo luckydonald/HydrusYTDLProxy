@@ -2,3 +2,7 @@ fastapi[standard]
 yt-dlp
 mutagen  # metadata
 python-multipart  # parse POST form submit
+
+# ddos checks
+beautifulsoup4
+Js2Py
