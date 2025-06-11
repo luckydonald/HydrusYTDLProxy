@@ -1,6 +1,6 @@
 import tempfile
 
-from hydrus.client import ClientSerialisable
+from hydrus_download_exporter.hydrus.client import ClientSerialisable
 
 from serializer_foo_two import generate_stuff_payload, PROVIDED_SERVICES_IDS
 from serializer_foo_patch import patch
