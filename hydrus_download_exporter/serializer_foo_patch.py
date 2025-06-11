@@ -38,9 +38,11 @@ class FakeHydrusController:
 def patch():
     CG.client_controller = FakeClientController()
     print('HydrusGlobals patched with FakeClientController')
+    QApplication
     app = QApplication([])
-    window = QMainWindow()
-    print('prepared QApplication and QMainWindow')
+    # print('prepared QApplication')
+    # window = QMainWindow()
+    # print('prepared QMainWindow')
 
     HG.controller = FakeHydrusController()
     print('set the value instead of the real HydrusGlobals.controller')
