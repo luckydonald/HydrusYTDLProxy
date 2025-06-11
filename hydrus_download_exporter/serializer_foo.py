@@ -24,9 +24,14 @@ def run(
         # end with
     # end if
     payload = generate_stuff_payload(host, proto, services=PROVIDED_SERVICES_IDS)#
+    print(f'PREPARED PAYLOAD: {payload!r}')
     (payload_bytes, payload_length) = ClientSerialisable.GetPayloadBytesAndLength(payload)
+    print(f'GENERATED PAYLOAD: {payload_bytes=}, {payload_length=}')
+
     patch()
+    print(f'GENERATING IMG: {payload_bytes=}, {payload_length=}')
     ClientSerialisable.DumpToPNG( width, payload_bytes, title, payload_description, text, path )
+    print(f'GENERATED IMG: {width=}, {payload_bytes=}, {payload_length=}')
 # end def
 
 
