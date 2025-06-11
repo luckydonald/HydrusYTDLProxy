@@ -12,3 +12,9 @@ Coolify:
 2. Set start command to `fastapi run main.py --port=4458`
 3. Set network port to `4458`.
 
+
+### Install
+macOS:
+```shell
+pip install opencv-python qtpy
+```
