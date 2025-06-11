@@ -1,12 +1,11 @@
 from typing import Literal, Annotated
 from typing_extensions import Doc
 
-from hydrus.client.ClientParsing import PageParser, ContentParser, ParseFormulaJSON, ParseFormulaZipper, \
+from hydrus.client.parsing.ClientParsing import PageParser, ContentParser, ParseFormulaJSON, ParseFormulaZipper, \
     ParseFormulaContextVariable
 from hydrus.client.ClientStrings import StringMatch, StringConverter, StringProcessor
 from hydrus.client.networking.ClientNetworkingGUG import GalleryURLGenerator
 from hydrus.client.networking.ClientNetworkingURLClass import URLClass, URLClassParameterFixedName
-from hydrus.core.HydrusConstants import ALL_SERVICES
 from hydrus.core.HydrusSerialisable import SerialisableList
 
 default = lambda x: x
@@ -223,19 +222,18 @@ def generate_stuff_payload(
             gallery_index_delta=default(1),
             example_url=f'{proto}://{host}/meta?url=https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330',
         )),
-        path('hydrus.client.ClientParsing.PageParser', PageParser(
+        path('hydrus.client.parsing.ClientParsing.PageParser', PageParser(
             name='HydrusYTDLProxy (parser) — /meta',
             parser_key=b"\x87`\x80\x18\xb0-\xec*I\xd3t:p\x7f_\x91\xe1\xd0\x1d\x19\x1d\xe1\xe7\x81ic'\xb9\x8c\xd2\xb1\x86",
             string_converter=path('hydrus.client.ClientStrings.StringConverter', StringConverter(
                 conversions=[],
                 example_string='example string',
             )),
-            sub_page_parsers=[],
             content_parsers=[
-                path('hydrus.client.ClientParsing.ContentParser', ContentParser(
+                path('hydrus.client.parsing.ClientParsing.ContentParser', ContentParser(
                     name='Note: Meta json',
                     content_type=18,
-                    formula=path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                    formula=path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                         parse_rules=[
                             (
                                 0,
@@ -254,12 +252,12 @@ def generate_stuff_payload(
                     )),
                     additional_info='ytdl meta json',
                 )),
-                path('hydrus.client.ClientParsing.ContentParser', ContentParser(
+                path('hydrus.client.parsing.ClientParsing.ContentParser', ContentParser(
                     name='Tag: description:<extractor>:<…>',
                     content_type=0,
-                    formula=path('hydrus.client.ClientParsing.ParseFormulaZipper', ParseFormulaZipper(
+                    formula=path('hydrus.client.parsing.ClientParsing.ParseFormulaZipper', ParseFormulaZipper(
                         formulae=[
-                            path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                            path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                                 parse_rules=[
                                     (
                                         0,
@@ -286,7 +284,7 @@ def generate_stuff_payload(
                                 name='.meta.extractor',
                                 string_processor=path('hydrus.client.ClientStrings.StringProcessor', StringProcessor()),
                             )),
-                            path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                            path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                                 parse_rules=[
                                     (
                                         0,
@@ -310,12 +308,12 @@ def generate_stuff_payload(
                     )),
                     additional_info='description',
                 )),
-                path('hydrus.client.ClientParsing.ContentParser', ContentParser(
+                path('hydrus.client.parsing.ClientParsing.ContentParser', ContentParser(
                     name='Tag: title:<extractor>:<…>',
                     content_type=0,
-                    formula=path('hydrus.client.ClientParsing.ParseFormulaZipper', ParseFormulaZipper(
+                    formula=path('hydrus.client.parsing.ClientParsing.ParseFormulaZipper', ParseFormulaZipper(
                         formulae=[
-                            path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                            path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                                 parse_rules=[
                                     (
                                         0,
@@ -342,7 +340,7 @@ def generate_stuff_payload(
                                 name='.meta.extractor',
                                 string_processor=path('hydrus.client.ClientStrings.StringProcessor', StringProcessor()),
                             )),
-                            path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                            path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                                 parse_rules=[
                                     (
                                         0,
@@ -366,10 +364,10 @@ def generate_stuff_payload(
                     )),
                     additional_info='title',
                 )),
-                path('hydrus.client.ClientParsing.ContentParser', ContentParser(
+                path('hydrus.client.parsing.ClientParsing.ContentParser', ContentParser(
                     name='Tags: from api',
                     content_type=0,
-                    formula=path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                    formula=path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                         parse_rules=[
                             (
                                 0,
@@ -392,10 +390,10 @@ def generate_stuff_payload(
                     )),
                     additional_info=default(None),
                 )),
-                path('hydrus.client.ClientParsing.ContentParser', ContentParser(
+                path('hydrus.client.parsing.ClientParsing.ContentParser', ContentParser(
                     name='URL: all the formats',
                     content_type=7,
-                    formula=path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                    formula=path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                         parse_rules=[
                             (
                                 0,
@@ -431,10 +429,10 @@ def generate_stuff_payload(
                         50
                     ),
                 )),
-                path('hydrus.client.ClientParsing.ContentParser', ContentParser(
+                path('hydrus.client.parsing.ClientParsing.ContentParser', ContentParser(
                     name='URL: best format',
                     content_type=7,
-                    formula=path('hydrus.client.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
+                    formula=path('hydrus.client.parsing.ClientParsing.ParseFormulaJSON', ParseFormulaJSON(
                         parse_rules=[
                             (
                                 0,
@@ -476,12 +474,12 @@ def generate_stuff_payload(
                         75
                     ),
                 )),
-                path('hydrus.client.ClientParsing.ContentParser', ContentParser(
+                path('hydrus.client.parsing.ClientParsing.ContentParser', ContentParser(
                     name='URL: the url provided via querystring',
                     content_type=7,
-                    formula=path('hydrus.client.ClientParsing.ParseFormulaZipper', ParseFormulaZipper(
+                    formula=path('hydrus.client.parsing.ClientParsing.ParseFormulaZipper', ParseFormulaZipper(
                         formulae=[
-                            path('hydrus.client.ClientParsing.ParseFormulaContextVariable', ParseFormulaContextVariable(
+                            path('hydrus.client.parsing.ClientParsing.ParseFormulaContextVariable', ParseFormulaContextVariable(
                                 variable_name='url',
                                 name='param provided url',
                                 string_processor=path('hydrus.client.ClientStrings.StringProcessor', StringProcessor()),
