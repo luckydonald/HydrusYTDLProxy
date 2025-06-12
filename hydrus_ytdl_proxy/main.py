@@ -18,12 +18,13 @@ from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP,
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse, FileResponse
 from starlette.background import BackgroundTask
-from regex_cleaner import clean_regex
 
 from .utils.dates import epoch_to_iso
 from .utils.fully_qualified_name import fqn
 from .utils.misc import default
 from .utils.types import guess_mime
+
+from .routes.providers import router as providers_router, list_providers
 
 
 os.environ['YTDLP_NO_LAZY_EXTRACTORS'] = '1'
@@ -96,49 +97,7 @@ class ProviderResponseModel(BaseModel):
 # end class
 
 
-@app.get("/providers", response_model=ProviderResponseModel)
-def list_providers():
-    """Get a list of domain names for all sites supported by yt-dlp."""
-    def flatten_providers(providers):
-        flattened = []
-        for item in providers:
-            if isinstance(item, str):
-                flattened.append(item)
-            elif isinstance(item, (list, tuple)):
-                flattened.extend(flatten_providers(item))
-            # end if
-        # end for
-        return flattened
-    # end def
-
-    providers = []
-    for cls in gen_extractor_classes():
-        if fqn(cls) == 'yt_dlp.extractor.generic.GenericIE' or cls.__name__ == 'GenericIE':
-            continue
-        # end if
-        valid_url = cls._VALID_URL
-        if valid_url is False:
-            continue
-        if isinstance(valid_url, (list, tuple)):
-            providers.extend(flatten_providers(valid_url))
-        else:
-            assert isinstance(valid_url, str)
-            providers.append(valid_url)
-        # end if
-        if ".*" in providers:
-            raise ValueError(f"Invalid Regex '.*' in provider {fqn(cls)} ")
-        # end if
-    # end for
-
-    better_providers = [clean_regex(provider) for provider in providers]
-    providers_merged = "|".join(better_providers)
-
-    return ProviderResponseModel(
-        all=providers,
-        normalized=better_providers,
-        regex=providers_merged,
-    )
-# end def
+app.include_router(providers_router, prefix="", tags=["providers"])
 
 
 # noinspection PyShadowingBuiltins
