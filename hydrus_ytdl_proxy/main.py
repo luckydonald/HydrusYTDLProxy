@@ -305,7 +305,6 @@ def export(request: Request):
         <form action="" method="POST">
             <label>Proto <input type="text" name="proto" value="{escape(request.headers.get('x-forwarded-proto', request.url.scheme))}" /></label><br>
             <label>Host <input type="text" name="host" value="{escape(request.url.hostname)}" /></label><br>
-            <label>Path <input type="text" name="path" value="/" /></label><br>
             {dropdown}
             <input type="submit" value="Submit" />
         </form>
@@ -317,7 +316,6 @@ def export_submit(
     request: Request,
     proto: Annotated[str, Form()],
     host: Annotated[str, Form()],
-    path: Annotated[str, Form()],
     provider: Annotated[str, Form()],
 ):
     from hydrus_download_exporter.serializer_foo import run
