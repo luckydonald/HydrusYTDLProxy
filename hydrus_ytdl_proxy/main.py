@@ -18,11 +18,11 @@ from yt_dlp.postprocessor.ffmpeg import FFmpegMetadataPP, FFmpegEmbedSubtitlePP,
 from pydantic import BaseModel
 from starlette.responses import HTMLResponse, FileResponse
 from starlette.background import BackgroundTask
+from regex_cleaner import clean_regex
 
 from .utils.dates import epoch_to_iso
 from .utils.fully_qualified_name import fqn
 from .utils.misc import default
-from .utils.regexes import normalize_multiline_regex
 from .utils.types import guess_mime
 
 
@@ -130,7 +130,7 @@ def list_providers():
         # end if
     # end for
 
-    better_providers = [normalize_multiline_regex(provider) for provider in providers]
+    better_providers = [clean_regex(provider) for provider in providers]
     providers_merged = "|".join(better_providers)
 
     return ProviderResponseModel(
