@@ -1,6 +1,8 @@
 import tempfile
+from pathlib import Path
 
-from hydrus.client import ClientSerialisable
+from hydrus_download_exporter.hydrus.client.ClientSerialisablePillow import dump_to_png_pillow
+from .hydrus.client import ClientSerialisable
 
 from .serializer_foo_two import generate_stuff_payload, PROVIDED_SERVICES_IDS
 from .serializer_foo_patch import patch
@@ -12,15 +14,15 @@ def run(
     payload_description="Automatically generated payload",
     host='hydrus-ytdl-proxy.example.com',
     text="",
-    path: str | None = None,
+    path: Path | None = None,
     proto = 'https',
-):
-
-    if path is None:
+) -> Path:
+    if path is None or not (path.exists() and path.is_file()):
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmpfile:
-            result = run(width, title, payload_description, host, text, tmpfile.name, proto)
+            tmp_file = Path(tmpfile.name)
+            result = run(width, title, payload_description, host, text, tmp_file, proto)
             input(f'Your file is saved to {tmpfile.name!r}. Press Enter to exit.')
-            return result
+            return tmp_file
         # end with
     # end if
     payload = generate_stuff_payload(host, proto, services=PROVIDED_SERVICES_IDS)#
@@ -30,8 +32,10 @@ def run(
 
     patch()
     print(f'GENERATING IMG: {payload_bytes=}, {payload_length=}')
-    ClientSerialisable.DumpToPNG( width, payload_bytes, title, payload_description, text, path )
+    dump_to_png_pillow( width, payload_bytes, title, payload_description, text, path )
+    # ClientSerialisable.DumpToPNG( width, payload_bytes, title, payload_description, text, path )
     print(f'GENERATED IMG: {width=}, {payload_bytes=}, {payload_length=}')
+    return path
 # end def
 
 

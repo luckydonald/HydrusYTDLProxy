@@ -324,15 +324,15 @@ def export_submit(
 
     tmpfile = NamedTemporaryFile(suffix=".png", delete=False)
     try:
+        temp_file = Path(tmpfile.name)
         run(
             title=f'Hydrus YTDLProxy Config for "{provider.title()}"',
             payload_description="Automatically generated downloader using Hydrus YTDLProxy",
             text="This was created by Hydrus YTDLProxy, to allow you to use a self-hosted YTDLP to download videos from platforms which have too advanced playback systems which Hydrus downloader can not support natively.",
             proto=proto,
             host=host,
-            path=path,
+            path=temp_file,
         )
-        temp_file = tmpfile.name
     except Exception as e:
         tmpfile.close()
         raise e
