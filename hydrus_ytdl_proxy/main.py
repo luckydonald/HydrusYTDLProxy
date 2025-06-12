@@ -1,9 +1,11 @@
+import json
 import os
 
 from datetime import datetime
 from html import escape
 from pathlib import Path
 from tempfile import TemporaryDirectory, NamedTemporaryFile
+from typing_extensions import Doc
 from urllib.parse import urlparse, urlencode
 from textwrap import dedent
 from typing import Literal, Annotated
@@ -250,14 +252,26 @@ def index():
     """))
 # end def
 
-def render_dropdown(values: dict[JsonValue, str], *, name: str) -> str:
+def render_dropdown(
+    values: dict[
+        Annotated[JsonValue, Doc("dropdown value")],
+        Annotated[str, Doc("dropdown display text")],
+    ],
+    *,
+    name: Annotated[str, Doc("dropdown form name= attribute")],
+) -> str:
     options = ("\n".join([f'<option value="{escape(key)}">{escape(value)}</option>' for key, value in values.items()]))
     return options.join([f'<select name="{escape(name)}">', '</select>'])
 # end def
 
 @app.get("/export.html", tags=["html"])
 def export(request: Request):
-    dropdown_options = {provider: provider for provider in list_providers().normalized}
+    dropdown_options = {}
+    for provider, regexes in list_providers().items():
+        for regex in regexes.normalized:
+            dropdown_options[json.dumps([provider, regex])] = f"{provider} — {regex})"
+        # end for
+    # end for
     dropdown = render_dropdown(dropdown_options, name="provider")
     return HTMLResponse(dedent(f"""
         <h1>Hydrus YTDLProxy Config Creator</h1>
