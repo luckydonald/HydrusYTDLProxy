@@ -62,7 +62,6 @@ def list_providers() -> ProviderResponse:
             all=regexes,
             normalized=better_regexes,
             regex=regexes_merged,
-
         )
     # end for
     return providers

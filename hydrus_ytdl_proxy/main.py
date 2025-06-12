@@ -264,15 +264,35 @@ def render_dropdown(
     return options.join([f'<select name="{escape(name)}">', '</select>'])
 # end def
 
+def render_dropdown_with_groups(
+    values: dict[
+        Annotated[JsonValue, Doc("Group name")],
+        dict[
+            Annotated[JsonValue, Doc("dropdown value")],
+            Annotated[str, Doc("dropdown display text")],
+        ],
+    ],
+    *,
+    name: Annotated[str, Doc("dropdown form name= attribute")],
+) -> str:
+    options = "\n".join(
+        [
+            f'<optgroup label="{escape(group)}">'
+            + "\n".join(
+                f'<option value="{escape(key)}">{escape(val)}</option>'
+                for key, val in group_values.items()
+            )
+            + "</optgroup>"
+            for group, group_values in values.items()
+        ]
+    )
+    return f'<select name="{escape(name)}">{options}</select>'
+# end def
+
 @app.get("/export.html", tags=["html"])
 def export(request: Request):
-    dropdown_options = {}
-    for provider, regexes in list_providers().items():
-        for regex in regexes.normalized:
-            dropdown_options[json.dumps([provider, regex])] = f"{provider} — {regex})"
-        # end for
-    # end for
-    dropdown = render_dropdown(dropdown_options, name="provider")
+    dropdown_options = {provider: {json.dumps([provider, regex]): regex for regex in regexes.normalized} for provider, regexes in list_providers().items()}
+    dropdown = render_dropdown_with_groups(dropdown_options, name="provider")
     return HTMLResponse(dedent(f"""
         <h1>Hydrus YTDLProxy Config Creator</h1>
         <form action="" method="POST">
