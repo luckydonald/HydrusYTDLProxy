@@ -22,7 +22,7 @@ def run(
             tmp_file = Path(tmpfile.name)
             result = run(width, title, payload_description, host, text, tmp_file, proto)
             input(f'Your file is saved to {tmpfile.name!r}. Press Enter to exit.')
-            return tmp_file
+            return result
         # end with
     # end if
     payload = generate_stuff_payload(host, proto, services=PROVIDED_SERVICES_IDS)#
