@@ -16,8 +16,8 @@ Coolify:
 ### Install
 macOS:
 ```shell
-pip install opencv-python qtpy
+pip install opencv-python PyQt6
 
 # pip install git+https://github.com/hydrusnetwork/hydrus.git#egg=hydrus&subdirectory=hydrus
-pip install git+https://github.com/luckydonald-forks/hydrus.git
+pip install git+https://github.com/luckydonald-forks/hydrus.git  # b395b605f555577e579907b52f0aaeb3a4c09dde
 ```
