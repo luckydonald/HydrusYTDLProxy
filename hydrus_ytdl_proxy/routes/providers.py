@@ -6,9 +6,6 @@ from fastapi import APIRouter
 from yt_dlp.extractor import gen_extractor_classes
 from pydantic import BaseModel
 from ..utils.fully_qualified_name import fqn
-from ..utils.dates import epoch_to_iso
-from ..utils.misc import default
-from ..utils.types import guess_mime
 from regex_cleaner import clean_regex
 
 router = APIRouter()
