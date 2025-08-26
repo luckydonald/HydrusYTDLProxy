@@ -312,12 +312,13 @@ def export_submit(
     provider: Annotated[str, Form()],
 ):
     from hydrus_download_exporter.serializer_foo import run
+    [ name, regexes ] = json.loads(provider)
 
     tmpfile = NamedTemporaryFile(suffix=".png", delete=False)
     try:
         temp_file = Path(tmpfile.name)
         run(
-            title=f'Hydrus YTDLProxy Config for "{provider.title()}"',
+            title=f'Hydrus YTDLProxy Config for "{name.title()}"',
             payload_description="Automatically generated downloader using Hydrus YTDLProxy",
             text="This was created by Hydrus YTDLProxy, to allow you to use a self-hosted YTDLP to download videos from platforms which have too advanced playback systems which Hydrus downloader can not support natively.",
             proto=proto,
@@ -335,7 +336,7 @@ def export_submit(
         path=temp_file,
         status_code=200,
         media_type="image/png",
-        filename=f"hydrus_ytdl_proxy_config_{provider.lower()}.png",
+        filename=f"hydrus_ytdl_proxy_config_{name.replace(' ', '_').lower()}.png",
         background=BackgroundTask(lambda: os.remove(temp_file)),  # cleanup the file after response is sent
     )
 # end def
