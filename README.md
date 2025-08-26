@@ -6,22 +6,20 @@ A thing to allow to use YouTube-dlp with Hydrus Network
 fastapi run main.py
 ```
 
-### Server Deployment
-#### Coolify:
-1. Add as <kbd>NIXPACK</kbd>
-2. Set start command to `fastapi run main.py --port=4458`
-3. Set network port to `4458`.
-
-
+## Server Deployment
 #### Docker:
 ```shell
 docker build -t hydrus-ytdl-proxy .
 docker run -d -p 4458:4458 hydrus-ytdl-proxy
 ```
 
-2. Go to <kbd>network</kbd> ➔ <kbd>downloader components</kbd> ➔ <kbd>manage url link classes</kbd>
+#### Coolify:
+1. Add as <kbd>NIXPACK</kbd>
+2. Set start command to `fastapi run main.py --port=4458`
+3. Set network port to `4458`.
 
-### Hydrus Network Setup
+
+## Hydrus Network Setup
 1. Open Hydrus Network
 2. Go to <kbd>network</kbd> ➔ <kbd>downloader components</kbd> ➔ <kbd>manage gallery url generators…</kbd> and click on <kbd>Add</kbd> to add a new one with the following settings:
       1. name: `HydrusYTDLProxy url`
