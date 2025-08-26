@@ -269,16 +269,7 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
          11. **send referral url**: <kbd>send referral url if available</kbd>
       5. **example url**: `http://<YOUR_SERVER_HOST_OR_IP>:4458/dl?url=https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330&format=best`
       6. <kbd>apply</kbd>
-
-Notes: 
-       - Replace `<YOUR_SERVER_HOST_OR_IP>` with your server's host or IP address,  
-         or localhost if you are running it on the same machine as Hydrus Network.
-       - Use `https` instead of `http` if you have ssl configured (Coolify does that), then you should also drop or adapt the port (`:4458`).
-       - Adapt the port `4458` if you run the server on a different port.
-      3. replacement phrase: `{url}`
-      4. search term separator: _empty_
-      5. initial search text (to prompt user): `url to download`
-      6. example text search: `https://www.youtube.com/watch?v=dQw4w9WgXcQ` or 
-      7. example request url: _automatically generated: `http://<YOUR_SERVER_HOST_OR_IP>:4458/meta?url=https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330`
-      8. matches as a: _automatically generated: `Matched HydrusYTDLProxy (meta as gallery) url class.`_
-      9. <kbd>OK</kbd>
+5. Now you can use the new url generator in Hydrus Network:
+   1. Open a <kbd>new page</kbd> ➔ <kbd>downloader</kbd> ➔ <kbd>gallery</kbd>
+   2. Select <kbd>`HydrusYTDLProxy url</kbd> from the dropdown menu.
+   3. Paste any YT-DLP / Youtube-dl supported URL into the search box.
