@@ -59,7 +59,7 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
       2. **content type**: <kbd>urls</kbd>
       3. **url type**: <kbd>url to download/pursue (file/post url)</kbd>
       4. **url quality precedence (higher is better)**: `75`
-      5. <kbd>edit formula<kbd> (type JSON, otherwise click <kbd>change formula type</kbd>)
+      5. <kbd>edit formula</kbd> (type JSON, otherwise click <kbd>change formula type</kbd>)
          1. **name/description**: `URL (best format) from json`
          2. <kbd>add</kbd> the following 3 steps:
             1. dictionary entry by key:
@@ -84,71 +84,70 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
    5. set up parsers: <kbd>add</kbd>
       1. **name or description(optional)**: `URL: Redirect to API (click edit formula twice to edit domain)`
       2. **content type**: <kbd>urls</kbd>
-         3. **url type**: <kbd>url to download/pursue (file/post url)</kbd>
-         4. **url quality precedence (higher is better)**: `50`
-         5. <kbd>edit formula<kbd> (type ZIPPER, otherwise click <kbd>change formula type</kbd>)
-            1. **name/description**: `Zipper rule to build the new url to redirect to the API.`
-            2. <kbd>add</kbd> the following 3 zipped parts:
-               - Zipper (start of url)
-                   1. <kbd>change formula type<kbd> ➔ <kbd>change to a new ZIPPER formula…</kbd>
-                   2. <kbd>edit formula<kbd>
-                      1. **name/description**: `EDIT HOST HERE IN "substitution phrase"`
-                      2. <kbd>add</kbd>
-                         1. <kbd>change formula type<kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
-                         2. <kbd>edit formula<kbd>
-                            1. **name/description**: `url`
-                            2. **variable name**: `url`
-                            3. _no string processing_.
-                            4. <kbd>apply</kbd>
-                         3. <kbd>apply</kbd>
-                      3. **substitution phrase**: `http://<YOUR_SERVER_HOST_OR_IP>:4458`
-                      4. <kbd>apply</kbd>
-                   3. <kbd>apply</kbd>
-               - Zipper (middle part of url)
-                   1. <kbd>change formula type<kbd> ➔ <kbd>change to a new ZIPPER formula…</kbd>
-                   2. <kbd>edit formula<kbd>
-                      1. **name/description**: `middle part of url`
-                      2. <kbd>add</kbd>
-                         1. <kbd>change formula type<kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
-                         2. <kbd>edit formula<kbd>
-                            1. **name/description**: `url`
-                            2. **variable name**: `url`
-                            3. _no string processing_.
-                            4. <kbd>apply</kbd>
-                         3. <kbd>apply</kbd>
-                      3. **substitution phrase**: `/meta?url=`
-                      4. <kbd>apply</kbd>
-                   3. <kbd>apply</kbd>
-               - Context variable (middle part of url)
-                   1. <kbd>change formula type<kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
-                   2. <kbd>edit formula<kbd>
-                      1. **name/description**: `encoded url`
-                      2. **variable name**: `url`
-                      3. Click <kbd>no string processing</kbd>.
-                         1. Click <kbd>add</kbd> 
-                            1. Select <kbd>String Converter</kbd>
-                            2. **example string**: `https://www.pornhub.com/view_video.php?viewkey=ph63348bf2f3330`
-                            3. Click <kbd>add</kbd>
-                               1. **conversion type**: <kbd>encode</kbd>
-                               2. **encoding type**: <kbd>url percent encoding</kbd>
-                               3. **example string**: `https://www.pornhub.com/view_video.php?viewkey=ph63348bf2f3330`
-                               4. **converted string**: _automatically generated: `https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330`_
-                               5. <kbd>apply</kbd>
-                            4. <kbd>apply</kbd>
-                         2. <kbd>apply</kbd>
-                      4. <kbd>apply</kbd>
-                   3. <kbd>apply</kbd>
-                  - fixed text: `formats`
-               2. dictionary entry by key:
-                  - match type: <kbd>fixed characters</kbd>
-                  - fixed text: `best`
-               3. dictionary entry by key:
-                  - match type: <kbd>fixed characters</kbd>
-                  - fixed text: `url`
-            3. **substitution phrase**: `\1\2\3`
-            4. _no string processing_.
-            5. <kbd>apply</kbd>
-         6. <kbd>apply</kbd>
+      3. **url type**: <kbd>url to download/pursue (file/post url)</kbd>
+      4. **url quality precedence (higher is better)**: `50`
+      5. <kbd>edit formula</kbd> (type ZIPPER, otherwise click <kbd>change formula type</kbd>)
+         1. **name/description**: `Zipper rule to build the new url to redirect to the API.`
+         2. <kbd>add</kbd> the following 3 zipped parts:
+            - Zipper (start of url)
+                1. <kbd>change formula type</kbd> ➔ <kbd>change to a new ZIPPER formula…</kbd>
+                2. <kbd>edit formula</kbd>
+                   1. **name/description**: `EDIT HOST HERE IN "substitution phrase"`
+                   2. <kbd>add</kbd>
+                      1. <kbd>change formula type</kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
+                      2. <kbd>edit formula<kbd>
+                         1. **name/description**: `url`
+                         2. **variable name**: `url`
+                         3. _no string processing_.
+                         4. <kbd>apply</kbd>
+                      3. <kbd>apply</kbd>
+                   3. **substitution phrase**: `http://<YOUR_SERVER_HOST_OR_IP>:4458`
+                   4. <kbd>apply</kbd>
+                3. <kbd>apply</kbd>
+            - Zipper (middle part of url)
+                1. <kbd>change formula type</kbd> ➔ <kbd>change to a new ZIPPER formula…</kbd>
+                2. <kbd>edit formula</kbd>
+                   1. **name/description**: `middle part of url`
+                   2. <kbd>add</kbd>
+                      1. <kbd>change formula type</kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
+                      2. <kbd>edit formula</kbd>
+                         1. **name/description**: `url`
+                         2. **variable name**: `url`
+                         3. _no string processing_.
+                         4. <kbd>apply</kbd>
+                      3. <kbd>apply</kbd>
+                   3. **substitution phrase**: `/meta?url=`
+                   4. <kbd>apply</kbd>
+                3. <kbd>apply</kbd>
+            - Context variable (middle part of url)
+                1. <kbd>change formula type<kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
+                2. <kbd>edit formula<kbd>
+                   1. **name/description**: `encoded url`
+                   2. **variable name**: `url`
+                   3. Click <kbd>no string processing</kbd>.
+                      1. Click <kbd>add</kbd> 
+                         1. Select <kbd>String Converter</kbd>
+                         2. **example string**: `https://www.pornhub.com/view_video.php?viewkey=ph63348bf2f3330`
+                         3. Click <kbd>add</kbd>
+                            1. **conversion type**: <kbd>encode</kbd>
+                            2. **encoding type**: <kbd>url percent encoding</kbd>
+                            3. **example string**: `https://www.pornhub.com/view_video.php?viewkey=ph63348bf2f3330`
+                            4. **converted string**: _automatically generated: `https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330`_
+                            5. <kbd>apply</kbd>
+                         4. <kbd>apply</kbd>
+                      2. <kbd>apply</kbd>
+                   4. <kbd>apply</kbd>
+                3. <kbd>apply</kbd>
+               - fixed text: `formats`
+            2. dictionary entry by key:
+               - match type: <kbd>fixed characters</kbd>
+               - fixed text: `best`
+            3. dictionary entry by key:
+               - match type: <kbd>fixed characters</kbd>
+               - fixed text: `url`
+         3. **substitution phrase**: `\1\2\3`
+         4. _no string processing_.
+         5. <kbd>apply</kbd>
       3. <kbd>apply</kbd>
    6. set up parsers: <kbd>add</kbd>
       1. **name or description(optional)**: `URL: just the given url for association`
