@@ -154,7 +154,7 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
       2. **content type**: <kbd>urls</kbd>
       3. **url type**: <kbd>POST parsers only: url to associate (source url)</kbd>
       4. **url quality precedence (higher is better)**: `100`
-      5. <kbd>edit formula<kbd> (type CONTEXT VARIABLE, otherwise click <kbd>change formula type</kbd> before)
+      5. <kbd>edit formula</kbd> (type CONTEXT VARIABLE, otherwise click <kbd>change formula type</kbd> before)
             1. **name/description**: `Original URL for association`
             2. **variable name**: `url` 
             3. <kbd>apply</kbd>
