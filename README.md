@@ -166,21 +166,21 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
       1. **name**: `HydrusYTDLProxy (meta)`
       2. **url type**: <kbd>post url</kbd>
       3. tab <kbd>march rules</kbd>
-         4. **preferred scheme**: <kbd>http</kbd> (or <kbd>https</kbd> if you have ssl configured)
-         5. **network location**: `<YOUR_SERVER_HOST_OR_IP>:4458`
-         6. **path components**: _none_
-         7. **parameters** ➔ <kbd>add</kbd>
-            2. **name**: `url`
-            3. **name, %-encoded**: `url`
-            4. **match type**: <kbd>regex</kbd>
-            5. **regex**: `https?(:|%3A)(/|%2F)(/|%2F).+`
-            6. **minimum allowed number of characters**: ☑️ no limit
-            7. **maximum allowed number of characters**: ☑️ no limit
-            8. **example string**: `https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330`
-            9. **default value**:  ☑️ none
-            10. **default value, %-encoded**:  ☑️ none
-            11. **default string processor**: _no string processing_.
-            12. <kbd>apply</kbd>
+         1. **preferred scheme**: <kbd>http</kbd> (or <kbd>https</kbd> if you have ssl configured)
+         2. **network location**: `<YOUR_SERVER_HOST_OR_IP>:4458`
+         3. **path components**: _none_
+         4. **parameters** ➔ <kbd>add</kbd>
+            1. **name**: `url`
+            2. **name, %-encoded**: `url`
+            3. **match type**: <kbd>regex</kbd>
+            4. **regex**: `https?(:|%3A)(/|%2F)(/|%2F).+`
+            5. **minimum allowed number of characters**: ☑️ no limit
+            6. **maximum allowed number of characters**: ☑️ no limit
+            7. **example string**: `https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330`
+            8. **default value**:  ☑️ none
+            9. **default value, %-encoded**:  ☑️ none
+            10. **default string processor**: _no string processing_.
+            11. <kbd>apply</kbd>
       4. tab <kbd>options</kbd>
          1. if matching by subdomain, keep it when normalising: _Disabled. ~~No ◻️~~_
          2. alphabetise GET parameters when normalising: Yes ☑️
