@@ -95,7 +95,7 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
                    1. **name/description**: `EDIT HOST HERE IN "substitution phrase"`
                    2. <kbd>add</kbd>
                       1. <kbd>change formula type</kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
-                      2. <kbd>edit formula<kbd>
+                      2. <kbd>edit formula</kbd>
                          1. **name/description**: `url`
                          2. **variable name**: `url`
                          3. _no string processing_.
@@ -120,8 +120,8 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
                    4. <kbd>apply</kbd>
                 3. <kbd>apply</kbd>
             - Context variable (middle part of url)
-                1. <kbd>change formula type<kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
-                2. <kbd>edit formula<kbd>
+                1. <kbd>change formula type</kbd> ➔ <kbd>change to a new CONTEXT VARIABLE formula…</kbd>
+                2. <kbd>edit formula</kbd>
                    1. **name/description**: `encoded url`
                    2. **variable name**: `url`
                    3. Click <kbd>no string processing</kbd>.
