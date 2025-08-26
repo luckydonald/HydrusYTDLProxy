@@ -178,9 +178,9 @@ docker run -d -p 4458:4458 hydrus-ytdl-proxy
             7. **maximum allowed number of characters**: ☑️ no limit
             8. **example string**: `https%3A%2F%2Fwww.pornhub.com%2Fview_video.php%3Fviewkey%3Dph63348bf2f3330`
             9. **default value**:  ☑️ none
-            9. **default value, %-encoded**:  ☑️ none
-            10. **default string processor**: _no string processing_.
-            11. <kbd>apply</kbd>
+            10. **default value, %-encoded**:  ☑️ none
+            11. **default string processor**: _no string processing_.
+            12. <kbd>apply</kbd>
       4. tab <kbd>options</kbd>
          1. if matching by subdomain, keep it when normalising: _Disabled. ~~No ◻️~~_
          2. alphabetise GET parameters when normalising: Yes ☑️
