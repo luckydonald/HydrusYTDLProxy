@@ -58,11 +58,16 @@ def list_providers() -> ProviderResponse:
         # end if
         better_regexes = [clean_regex(regex) for regex in regexes]
         regexes_merged = "|".join(better_regexes)
+        import exrex
+        print(regexes_merged)
+        regexess = list(exrex.generate(regexes_merged, 100))
+        print(regexess)
         providers[cls.IE_NAME] = ProviderRegexes(
             all=regexes,
             normalized=better_regexes,
             regex=regexes_merged,
         )
+
     # end for
     return providers
 # end def

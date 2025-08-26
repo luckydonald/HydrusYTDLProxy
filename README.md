@@ -20,5 +20,5 @@ pip install opencv-python PyQt6
 
 # pip install git+https://github.com/hydrusnetwork/hydrus.git#egg=hydrus&subdirectory=hydrus
 pip install git+https://github.com/luckydonald-forks/hydrus.git  # b395b605f555577e579907b52f0aaeb3a4c09dde
-pip install regex-cleaner
+pip install regex-cleaner exrex
 ```
